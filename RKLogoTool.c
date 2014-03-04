@@ -385,18 +385,25 @@ static void read_clut(int off, char* outdir, unsigned char* buf)
 	int nClutSectionSize = (nClutItems * 3) + ((MAX_LINUX_LOGO_COLORS * 3) - nClutItems) + 0x11;
 
 	char magic[17] = {0};
-	if(buf[nClutSectionSize + 6] != 'l')
-		nClutSectionSize-=2;
+	while(buf[nClutSectionSize + 6] != 'l')
+	{
+		nClutSectionSize++;
+		if(nClutSectionSize > 0x500)
+		{
+			fprintf(stderr,"Cannot stat clut section size :|\n");
+			return;
+		}
+	}
 	
 	strncpy(magic, &buf[nClutSectionSize + 6], 16);
 	
 	short wWidth  = swap_uint16(*(short*)&buf[nClutSectionSize + 2]);
 	short wHeight = swap_uint16(*(short*)&buf[nClutSectionSize + 4]);
 
-	fprintf(stderr,"Processing an image @0x%X.Format: %ux%u@%d\n",off, wWidth, wHeight, nClutItems);
+	fprintf(stderr,"Processing an image @0x%X.Format: %ux%u@%d. CLUT section size 0x%X\n",off, wWidth, wHeight, nClutItems, nClutSectionSize);
 	if(strcmp(magic,"logo_RKlogo_data"))
 	{
-		fprintf(stderr,"Wrong magic, skipping...\n");
+		fprintf(stderr,"Wrong magic (%s ...), skipping...\n", magic);
 		return;
 	}
 	
