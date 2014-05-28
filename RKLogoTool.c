@@ -382,10 +382,10 @@ static void read_clut(int off, char* outdir, unsigned char* buf)
 	}
 	
 	unsigned char nClutItems = buf[0x10];
-	int nClutSectionSize = (nClutItems * 3) + ((MAX_LINUX_LOGO_COLORS * 3) - nClutItems) + 0x11;
+	int nClutSectionSize = (nClutItems * 3) + ((MAX_LINUX_LOGO_COLORS * 3) - nClutItems);
 
 	char magic[17] = {0};
-	while(buf[nClutSectionSize + 6] != 'l')
+	while(buf[nClutSectionSize + 6] != 'l' && buf[nClutSectionSize + 11] != 'R')
 	{
 		nClutSectionSize++;
 		if(nClutSectionSize > 0x500)
